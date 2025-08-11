@@ -25,7 +25,7 @@ A web-based platform for managing classrooms, students, teachers, attendance, no
 ![Teacher Dashboard](https://github.com/Dhanashri-code-hash/ClassEdge-Classroom-Management-System/blob/main/Screenshot%202025-08-08%20220350.png?raw=true)
 
 ### 5. Teacher Dashboard – Notes & Assignments
-![Teacher Notes and Assignments](screenshots/Screenshot5.png)
+![Teacher Notes and Assignments](https://github.com/Dhanashri-code-hash/ClassEdge-Classroom-Management-System/blob/main/Screenshot%202025-08-08%20220407.png?raw=true)
 
 ---
 
