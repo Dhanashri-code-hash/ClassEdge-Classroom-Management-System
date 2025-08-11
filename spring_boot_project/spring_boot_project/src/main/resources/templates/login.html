@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4A90E2; /* A modern, friendly blue */
+            --primary-blue-dark: #3A7BBF;
+            --primary-blue-light: #8DCFFF;
+            --text-dark: #333;
+            --text-medium: #555;
+            --text-light: #777;
+            --bg-light: #f7f9fc; /* Very subtle light background */
+            --card-bg: #ffffff;
+            --border-color: #e0e6ed;
+            --input-focus-shadow: rgba(74, 144, 226, 0.2); /* Soft blue shadow for input focus */
+            --error-red: #E74C3C;
+            --shadow-subtle: 0 4px 15px rgba(0, 0, 0, 0.08); /* Lighter, more diffused shadow */
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Modern font */
+            background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Subtle gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Add some padding for smaller screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        .login-container {
+            background-color: var(--card-bg);
+            padding: 50px 40px; /* More vertical padding */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: var(--shadow-subtle);
+            width: 100%;
+            max-width: 420px; /* Slightly wider max-width */
+            text-align: center;
+            border: 1px solid var(--border-color); /* Subtle border */
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation on load */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-8px); /* More noticeable lift on hover */
+            transition: all 0.4s ease-in-out; /* Smoother transition for hover */
+        }
+
+        h1 {
+            color: var(--text-dark);
+            margin-bottom: 35px; /* More spacing */
+            font-size: 2.5em; /* Larger title */
+            font-weight: 700; /* Bolder */
+            letter-spacing: -0.5px; /* Tighter letter spacing */
+        }
+        .form-group {
+            margin-bottom: 28px; /* More spacing */
+            text-align: left;
+            position: relative; /* For floating labels if desired later */
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px; /* Consistent spacing */
+            color: var(--text-medium);
+            font-weight: 600; /* Bolder label */
+            font-size: 0.95em; /* Slightly smaller label for cleaner look */
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 15px 18px; /* Generous padding */
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* More rounded input fields */
+            font-size: 1.05em;
+            color: var(--text-dark);
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-group input[type="text"]::placeholder,
+        .form-group input[type="password"]::placeholder {
+            color: var(--text-light);
+            font-weight: 300; /* Lighter placeholder text */
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="password"]:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 4px var(--input-focus-shadow);
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Adjusted spacing between buttons */
+            margin-top: 40px; /* More spacing above buttons */
+        }
+        .button-group button {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 16px 25px; /* Increased padding */
+            border: none;
+            border-radius: 10px; /* More rounded buttons */
+            cursor: pointer;
+            font-size: 1.1em; /* Slightly adjusted font size */
+            font-weight: 700; /* Bolder text */
+            letter-spacing: 0.2px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Initial subtle shadow */
+        }
+        .button-group button:hover {
+            background-color: var(--primary-blue-dark);
+            transform: translateY(-4px); /* More pronounced lift on hover */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .button-group button:active {
+            background-color: #2D6CA8; /* Even darker blue */
+            transform: translateY(0px); /* Push down effect */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Smaller shadow on click */
+        }
+        .error-message {
+            color: var(--error-red);
+            background-color: #ffe6e6; /* Light red background for error message */
+            border: 1px solid #ffcccc;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 30px; /* More spacing */
+            font-size: 0.9em;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px); /* Start slightly below */
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out; /* Smooth transition */
+        }
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 30px 25px;
+                border-radius: 12px;
+                margin: 0 15px; /* Add horizontal margin */
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .form-group input {
+                padding: 12px 15px;
+            }
+            .button-group button {
+                padding: 14px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Welcome Back!</h1>
+        <form method="post" id="loginForm">
+            <div class="form-group">
+                <label for="emailOrUsername">Email or Username</label>
+                <input type="text" id="emailOrUsername" name="emailOrUsername" placeholder="your.email@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            <div class="button-group">
+                <button formaction="/student/login">Login as Student</button>
+                <button formaction="/teacher/login">Login as Teacher</button>
+            </div>
+        </form>
+        <p th:if="${error}" th:text="${error}" class="error-message" th:classappend="${error} ? 'show'"></p>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = document.querySelector('.error-message');
+
+            // This script ensures the error message fades in smoothly
+            // if it's already present when the page loads (due to Thymeleaf rendering).
+            if (errorMessage && errorMessage.textContent.trim() !== '') {
+                // Remove the 'show' class first if Thymeleaf already added it,
+                // then re-add it after a tiny delay to trigger the CSS transition.
+                // This handles cases where the page reloads with an error.
+                errorMessage.classList.remove('show');
+                setTimeout(() => {
+                    errorMessage.classList.add('show');
+                }, 50); // Small delay
+            }
+        });
+    </script>
+</body>
+</html>

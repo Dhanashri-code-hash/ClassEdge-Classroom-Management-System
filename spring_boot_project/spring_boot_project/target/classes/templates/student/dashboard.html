@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50; /* A pleasant green, like a chalkboard */
+            --secondary-color: #2196F3; /* A friendly blue */
+            --accent-color: #FFC107; /* A warm yellow */
+            --danger-color: #F44336; /* Red for low attendance */
+            --text-dark: #333;
+            --text-medium: #555; /* For logout button text */
+            --text-light: #777;
+            --bg-light: #f9fbfd; /* Very subtle light background */
+            --bg-card: #ffffff;
+            --border-color: #e0e6ed;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Nunito Sans', sans-serif; /* A more friendly, rounded font */
+            background-color: var(--bg-light);
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e8eef6" fill-opacity="0.7"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM2 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z"%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); /* Subtle notebook paper-like pattern */
+            margin: 0;
+            padding: 30px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+        }
+
+        .container {
+            max-width: 1000px; /* Wider for more content */
+            width: 100%;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            padding: 40px 50px; /* Generous padding */
+            border-radius: 18px; /* Softer rounded corners */
+            box-shadow: 0 12px 40px var(--shadow-medium); /* Deeper, softer shadow */
+            border: 1px solid var(--border-color); /* Subtle border */
+            position: relative; /* Added for absolute positioning of logout */
+        }
+
+        /* Styles for the Logout Button and Username */
+        .logout-container {
+            position: absolute;
+            top: 25px; /* Adjust as needed for desired spacing from top */
+            right: 30px; /* Adjust as needed for desired spacing from right */
+            z-index: 10; /* Ensure it's above other content */
+            display: flex; /* Make it a flex container */
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-end; /* Align items to the right */
+        }
+
+        .username-display {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px; /* Space between name and button */
+            text-align: right; /* Align text to the right */
+            white-space: nowrap; /* Prevent name from wrapping */
+        }
+
+        .logout-button {
+            background-color: transparent; /* Transparent background */
+            color: var(--text-medium); /* Dark grey text */
+            border: 1px solid var(--border-color); /* Subtle border */
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-button:hover {
+            background-color: #f0f2f5; /* Light background on hover */
+            color: var(--text-dark); /* Darker text on hover */
+            border-color: #cdd3dc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .logout-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+
+        h2 {
+            font-family: 'Poppins', sans-serif; /* Keep Poppins for headings */
+            color: #2c3e50;
+            font-size: 2.8em; /* Even larger title */
+            margin-bottom: 35px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+            margin-top: 0; /* Adjusted to allow logout button to be above */
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background-color: var(--primary-color); /* Matches primary theme */
+            border-radius: 3px;
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #34495e;
+            font-size: 2em; /* Larger subheading */
+            margin-top: 45px;
+            margin-bottom: 25px;
+            border-bottom: 2px dashed var(--border-color); /* Dashed line for a notebook feel */
+            padding-bottom: 12px;
+            text-align: left;
+            display: flex; /* For icon alignment */
+            align-items: center; /* For icon alignment */
+            gap: 10px; /* Space between icon and text */
+        }
+
+        /* --- Card Styling --- */
+        .card {
+    background-color: var(--bg-card);
+    border-radius: 15px;
+    box-shadow: 0 6px 25px var(--shadow-light);
+    padding: 35px;
+    margin-bottom: 35px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    color: #000; /* Dark text for all content */
+    font-weight: 500; /* Make text slightly bolder by default */
+}
+
+        .card:hover {
+            transform: translateY(-7px); /* More pronounced lift */
+            box-shadow: 0 15px 45px var(--shadow-medium);
+        }
+
+        /* --- Attendance Section (Circular Progress) --- */
+        .attendance-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 35px;
+            margin-bottom: 45px;
+            background-color: #f0f8ff; /* A very light blue, like a clear sky */
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #d0e0ed;
+        }
+
+        .attendance-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 30px;
+            border-bottom: none;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .attendance-circle-container {
+            position: relative;
+            width: 200px; /* Even larger circle */
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0e0e0;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.08);
+        }
+
+        .attendance-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.8em; /* Much larger percentage text */
+            font-weight: 800;
+            background: conic-gradient(var(--primary-color) var(--percentage), #e0e0e0 var(--percentage)); /* Default green */
+            transition: background 0.8s ease-in-out; /* Smooth fill animation */
+        }
+
+        /* Dynamic coloring based on percentage */
+        .attendance-circle.high {
+            background: conic-gradient(var(--primary-color) var(--percentage), #e0e0e0 var(--percentage)); /* Green */
+        }
+        .attendance-circle.medium {
+            background: conic-gradient(var(--accent-color) var(--percentage), #e0e0e0 var(--percentage)); /* Orange */
+        }
+        .attendance-circle.low {
+            background: conic-gradient(var(--danger-color) var(--percentage), #e0e0e0 var(--percentage)); /* Red */
+        }
+
+        .attendance-circle::before { /* Inner circle to show background */
+            content: '';
+            position: absolute;
+            width: 88%; /* Slightly larger inner circle */
+            height: 88%;
+            background-color: var(--bg-card); /* Inner background color */
+            border-radius: 50%;
+            z-index: 1; /* Above the conic gradient */
+        }
+
+        .attendance-circle span {
+            position: relative;
+            z-index: 2; /* Above the inner circle */
+            font-size: 0.8em; /* Adjust percentage text size within circle */
+            font-weight: 800;
+            color: var(--secondary-color); /* Adjusted to blue */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* For better contrast */
+        }
+
+        /* --- List Styling --- */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #fdfdfd;
+            border: 1px solid var(--border-color);
+            border-left: 6px solid transparent; /* Thicker left border */
+            padding: 18px 25px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        li:hover {
+            transform: translateX(8px); /* More pronounced slide effect */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid var(--secondary-color); /* Highlight on hover */
+        }
+
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space for icon */
+        }
+
+        a:hover {
+            color: #1a7bbd;
+            text-decoration: underline;
+        }
+
+        .note-description {
+            color: var(--text-light);
+            font-size: 0.95em;
+            margin-left: 25px;
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .assignment-info {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .assignment-info .filename {
+            font-weight: 600;
+            color: var(--text-dark);
+            flex-shrink: 1;
+            margin-right: 20px;
+        }
+
+        .assignment-info .date {
+            font-size: 0.9em;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        /* --- Custom File Input Styling --- */
+        .assignment-upload-form {
+            padding: 35px;
+            margin-top: 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+            border: 2px dashed #b3e0ff;
+            background-color: #f5fcff;
+            border-radius: 15px;
+        }
+
+        .file-input-wrapper {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .file-input-wrapper .custom-file-button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-input-wrapper .custom-file-button:hover {
+            background-color: #1a7bbd;
+            transform: translateY(-3px);
+        }
+
+        .file-input-wrapper .custom-file-button:active {
+            background-color: #1565c0;
+            transform: translateY(0);
+        }
+
+        .file-input-wrapper .file-name-display {
+            margin-top: 12px;
+            font-size: 1em;
+            color: var(--text-dark);
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 15px;
+            font-style: italic;
+        }
+
+        .upload-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px 35px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-button:hover {
+            background-color: #43a047;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-button:active {
+            background-color: #388e3c;
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logout-container">
+            <span th:if="${studentName}" class="username-display" th:text="${studentName}">Student Name</span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
+
+        <h2>Welcome, <span th:text="${student.name}"></span>!</h2>
+
+        <div class="card attendance-section">
+            <h3><i class="fas fa-chart-pie"></i> Your Attendance</h3>
+            <div class="attendance-circle-container">
+                <div class="attendance-circle" th:style="'--percentage: ' + ${student.attendance} + '%'"
+                     th:classappend="${student.attendance > 80 ? 'high' : (student.attendance > 60 ? 'medium' : 'low')}">
+                    <span th:text="${student.attendance} + '%'"></span>
+                </div>
+            </div>
+            <p style="color: var(--text-light); font-size: 1em; margin-top: 15px; text-align: center;">Your current attendance record.</p>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-sticky-note"></i> Recent Notes</h3>
+            <ul>
+                <li th:each="note : ${notes}">
+                    <a th:href="@{'/uploads/notes/' + ${note.filename}}" th:text="${note.filename}" target="_blank">
+                        <i class="fas fa-file-alt"></i>
+                    </a>
+                    <span class="note-description" th:text="${note.description}"></span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-tasks"></i> Your Submitted Assignments</h3>
+            <ul>
+                <li th:each="a : ${assignments}">
+                    <div class="assignment-info">
+                        <a th:href="@{'/uploads/assignments/' + ${a.fileName}}" th:text="${a.fileName}" target="_blank">
+                            <i class="fas fa-file-upload"></i>
+                        </a>
+                        <span class="date" th:text="${a.uploadDate}"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card assignment-upload-form">
+            <h3><i class="fas fa-paper-plane"></i> Submit New Assignment</h3>
+            <form method="post" th:action="@{/student/submit-assignment}" enctype="multipart/form-data" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <input type="hidden" name="studentId" th:value="${student.id}" />
+
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" id="assignmentFile" required />
+                    <label for="assignmentFile" class="custom-file-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V8.5a.5.5 0 0 1-1 0V2.707L4.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                        Choose File
+                    </label>
+                </div>
+                <span id="fileNameDisplay" class="file-name-display">No file chosen</span>
+
+                <button type="submit" class="upload-button">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Assignment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Script for dynamic file input display
+            const fileInput = document.getElementById('assignmentFile');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                } else {
+                    fileNameDisplay.textContent = 'No file chosen';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
